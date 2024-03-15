@@ -1,0 +1,48 @@
+service: email-inventory-integration
+
+plugins:
+  - serverless-python-requirements
+  - serverless-pseudo-parameters
+
+custom:
+  pythonRequirements:
+    dockerizePip: false
+    layer: true
+
+package:
+  exclude:
+    - ./**
+  include:
+    - email_inventory_integration/**
+
+provider:  
+  name: aws
+  runtime: python3.9
+  env: dev
+  region: us-east-1
+  deploymentBucket: ${self:provider.env}-extract-email-attachment
+  configBucket: ${self:provider.env}-extract-email-attachment
+  role: arn:aws:iam::#{AWS::AccountId}:role/LambdaExecutionRole  
+
+functions:
+  inventoryEmailIntegration:
+    name: ${self:provider.env}-extract-email-attachment
+    handler: src.get_email_attachment.handler
+    layers:
+      - { Ref: PythonRequirementsLambdaLayer }
+    timeout: 15
+    memorySize: 128
+    environment:
+      ENV: ${self:provider.env}
+      BUCKET:  ${self:provider.env}-extract-email-attachment
+      TARGET_FOLDER: 'extracted-attachments'
+      SUBJECT: 'Desired email subject'
+    events:
+      - s3:
+          bucket:  ${self:provider.env}-extract-email-attachment
+          event: s3:ObjectCreated:*
+          rules:
+            - prefix: raw-email-attachments/
+          existing: true
+          forceDeploy: true
+
