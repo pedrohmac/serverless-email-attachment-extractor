@@ -30,10 +30,10 @@ def handler(event, _context):
     msg = email.message_from_string(contents)
     attachment = msg.get_payload()[1]
     if SUBJECT not in msg['subject'].lower():
-        LOGGER.info(f'Email subject does not match tenant: {msg["subject"]}')
+        LOGGER.info(f'Email subject does not match expected: {msg["subject"]}')
         return  {
         'statusCode': 303,
-        'body': f'Email subject does not match tenant: {msg["subject"]}'
+        'body': f'Email subject does not match expected: {msg["subject"]}'
     }
     store_id = attachment.get_filename().split(".")[0]
 

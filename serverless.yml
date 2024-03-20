@@ -35,8 +35,8 @@ functions:
     environment:
       ENV: ${self:provider.env}
       BUCKET:  ${self:provider.env}-extract-email-attachment
-      TARGET_FOLDER: 'extracted-attachments'
-      SUBJECT: 'Desired email subject'
+      TARGET_FOLDER: "extracted-attachments"
+      SUBJECT: "Desired email subject"
     events:
       - s3:
           bucket:  ${self:provider.env}-extract-email-attachment
